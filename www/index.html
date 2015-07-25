@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Storage Example</title>
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <script type="text/javascript" charset="utf-8">
+
+    // Wait for device API libraries to load
+    //
+    document.addEventListener("deviceready", onDeviceReady, false);
+
+    // Populate the database
+    //
+    function populateDB(tx) {
+        tx.executeSql('DROP TABLE IF EXISTS DEMO');
+        tx.executeSql('CREATE TABLE IF NOT EXISTS DEMO (id unique, data)');
+        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (1, "First row")');
+        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (2, "Second row")');
+        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (3, "my world row 3")');
+        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (4, "my world row 4")');
+        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (5, "First row")');
+        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (6, "Second row")');
+        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (7, "my world row 3")');
+        tx.executeSql('INSERT INTO DEMO (id, data) VALUES (8, "my world row 4")');
+    }
+
+    // Query the database
+    //
+    function queryDB(tx) {
+        tx.executeSql('SELECT * FROM DEMO', [], querySuccess, errorCB);
+    }
+
+    // Query the success callback
+    //
+    function querySuccess(tx, results) {
+        var len = results.rows.length;
+        console.log("DEMO table: " + len + " rows found.");
+        for (var i=0; i<len; i++){
+            console.log("Row = " + i + " ID = " + results.rows.item(i).id + " Data =  " + results.rows.item(i).data);
+        }
+    }
+
+    // Transaction error callback
+    //
+    function errorCB(err) {
+        console.log("Error processing SQL: "+err.code);
+    }
+
+    // Transaction success callback
+    //
+    function successCB() {
+        var db = window.openDatabase("Database", "1.0", "Cordova Demo", 10);
+        db.transaction(queryDB, errorCB);
+    }
+
+    // device APIs are available
+    //
+    function onDeviceReady() {
+        //SQL Web Databse. Size of db is an estimate, not fixed
+        var db = window.openDatabase("Database", "1.0", "Cordova Demo", 10);
+        db.transaction(populateDB, errorCB, successCB);
+
+        //change database version
+        //db.changeVersion("1.1","1.0");
+        //alert(db.version);
+
+        //connect to any db version
+        //var db = window.openDatabase("Database", "", "Cordova Demo", 100000);
+
+        console.log('Testing localStorage...');
+        console.log('key_old stored in localStorage from previous session: '+window.localStorage.getItem("key_old"));
+        console.log('key_session stored in sessionStorage from previous session: '+window.localStorage.getItem("key_session"));
+        window.localStorage.setItem("my key", "my value");
+        var keyname = window.localStorage.key(0);
+        console.log('key name accessed by window.localStorage.key: '+keyname);
+        // keyname is now equal to "key"
+        var value = window.localStorage.getItem("my key");
+        console.log('Value accessed by window.localStorage.getItem: '+value);
+        // value is now equal to "value"
+        window.localStorage.removeItem("my key");
+        console.log('Value accessed by window.localStorage.getItem after removing item: '+window.localStorage.getItem("my key"));
+        window.localStorage.setItem("key2", "value2");
+        window.localStorage.clear();
+        console.log('Value2 accessed by window.localStorage.getItem after clearing localStorage: '+window.localStorage.getItem("key2"));
+        window.localStorage.setItem("key_old", "value_old");
+        window.sessionStorage.setItem("key_session", "value_session " + new Date());
+        console.log('key_session accessed by window.sessionStorage.getItem: '+window.sessionStorage.getItem("key_session"));
+        // localStorage is now empty
+    }
+
+    </script>
+  </head>
+  <body>
+    <h1>Example</h1>
+    <p>Database</p>
+  </body>
+</html>
